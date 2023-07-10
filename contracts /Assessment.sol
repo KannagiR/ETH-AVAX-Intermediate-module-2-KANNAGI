@@ -21,7 +21,7 @@ contract Assessment {
         return balance;
     }
 
-    function deposit(uint256 _amount) public payable {
+    function depositamount(uint256 _amount) public payable {
         uint _previousBalance = balance;
 
         // make sure this is the owner
@@ -40,8 +40,8 @@ contract Assessment {
     // custom error
     error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
 
-    function withdraw(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner of this account");
+    function withdrawamount(uint256 _withdrawAmount) public {
+        require(msg.sender == owner, "You are not the owner.");
         uint _previousBalance = balance;
         if (balance < _withdrawAmount) {
             revert InsufficientBalance({
@@ -50,34 +50,20 @@ contract Assessment {
             });
         }
 
-        // withdraw the given amount
+        // withdrawamount
         balance -= _withdrawAmount;
 
-        // assert the balance is correct
+        // assert if the balance is correct
         assert(balance == (_previousBalance - _withdrawAmount));
 
         // emit the event
         emit Withdraw(_withdrawAmount);
     }
 
-    function checkOwner()public pure returns(string memory){
-        string memory name="Moshahid Raza";
+    function Ownercheck()public pure returns(string memory){
+        string memory name="Kannagi Rajkhowa";
         return name;
     }
     
-    function addition(uint a, uint b) public pure returns(uint){
-        return a+b;
-        
-        // emit Addition((a+b));
-    }
-
-    function substraction(uint a, uint b) public pure returns(uint){
-        require(a>=b,"value of a must me greater than b");
-        return a-b;
-    }
-
-    function multiplication(uint a, uint b) public pure returns(uint){
-        return a*b;
-    }
     
-}
+  
