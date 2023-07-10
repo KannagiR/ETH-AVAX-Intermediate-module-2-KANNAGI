@@ -7,52 +7,39 @@ export default function HomePage() {
   const [account, setAccount] = useState(undefined);
   const [atm, setATM] = useState(undefined);
   const [balance, setBalance] = useState(undefined);
-  const [ownerName, setOwnerName] = useState(undefined);
-  const [add, setAdd] = useState(undefined);
-  const [sub, setSub] = useState(undefined);
-  const [mult, setMult] = useState(undefined);
-  const [inputA, setInputA] = useState("");
-  const [inputB, setInputB] = useState("");
 
-  
-  const contractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
-
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
 
-  const getWallet = async() => {
+  const getWallet = async () => {
     if (window.ethereum) {
       setEthWallet(window.ethereum);
-      window.ethereum.on("accountsChanged", (accounts) => {
-        handleAccount(accounts);
-      });
     }
 
     if (ethWallet) {
-      const accounts = await ethWallet.request({method: "eth_accounts"});
-      handleAccount(accounts);
+      const account = await ethWallet.request({ method: "eth_accounts" });
+      handleAccount(account);
     }
-  }
+  };
 
   const handleAccount = (account) => {
     if (account) {
-      console.log ("Account connected: ", account);
+      console.log("Account connected: ", account);
       setAccount(account);
+    } else {
+      console.log("No account is found like this");
     }
-    else {
-      console.log("No account found");
-    }
-  }
+  };
 
-  const connectAccount = async() => {
+  const connectAccount = async () => {
     if (!ethWallet) {
-      alert('MetaMask wallet is required to connect');
+      alert("Please Connect Metamask Wallet");
       return;
     }
-  
-    const accounts = await ethWallet.request({ method: 'eth_requestAccounts' });
+
+    const accounts = await ethWallet.request({ method: "eth_requestAccounts" });
     handleAccount(accounts);
-    
-    // once wallet is set we can get a reference to our deployed contract
+
     getATMContract();
   };
 
@@ -62,77 +49,43 @@ export default function HomePage() {
     const atmContract = new ethers.Contract(contractAddress, atmABI, signer);
 
     setATM(atmContract);
-  }
+  };
 
-  const getBalance = async() => {
+  const getBalance = async () => {
     if (atm) {
       setBalance((await atm.getBalance()).toNumber());
     }
-  }
-
-  const deposit = async() => {
-    if (atm) {
-      let tx = await atm.deposit(1);
-      await tx.wait()
-      getBalance();
-    }
-  }
-
-  const withdraw = async() => {
-    if (atm) {
-      let tx = await atm.withdraw(1);
-      await tx.wait()
-      getBalance();
-    }
-  }
-  const checkOwner = async () => {
-    if (atm) {
-      let owner = await atm.checkOwner();
-      setOwnerName("Moshahid Raza");
-    }
-  }
-  const addition = async () => {
-      if (atm) {
-        const a = parseInt(inputA);
-        const b = parseInt(inputB);
-        const answer = await atm.addition(a,b);
-        setAdd(answer);
-      }
-  }  
-  const subtraction = async () => {
-    if (atm) {
-      const a = parseInt(inputA);
-      const b = parseInt(inputB);
-      const answer = await atm.substraction(a,b);
-      setSub(answer);
-    }
-  }
-  const multiplication = async () => {
-    if (atm) {
-      const a = parseInt(inputA);
-      const b = parseInt(inputB);
-      const answer = await atm.multiplication(a,b);
-      setMult(answer);
-    }
-  }
-  const handleInputAChange = (event) => {
-    setInputA(event.target.value);
   };
 
-  const handleInputBChange = (event) => {
-    setInputB(event.target.value);
+  const deposit = async () => {
+    if (atm) {
+      let tx = await atm.deposit(1, { gasLimit: 3e7 });
+      await tx.wait();
+      getBalance();
+    }
   };
 
-  
+  const withdraw = async () => {
+    if (atm) {
+      let tx = await atm.withdraw(1, { gasLimit: 3e7 });
+      await tx.wait();
+      getBalance();
+    }
+  };
+
   const initUser = () => {
-    // Check to see if user has Metamask
+    // Check if user has Metamask
     if (!ethWallet) {
-      return <p>Please install Metamask in order to use this ATM.</p>
+      return <p>You need to install Metamask in order to use this ATM.</p>;
     }
 
-    // Check to see if user is connected. If not, connect to their account
+    // Check if user is connected. If not, connect to their account
     if (!account) {
-      return <button onClick={connectAccount}>Please connect your Metamask wallet</button>
+      return (
+        <button onClick={connectAccount}>
+          Connect your Metamask wallet
+        </button>
+      );
     }
 
     if (balance == undefined) {
@@ -140,70 +93,65 @@ export default function HomePage() {
     }
 
     return (
-      <>
-        <div>
-          <p style={{ fontFamily: "Sans-serif" }}>Your Account: {account}</p>
-          <p style={{ fontFamily: "Sans-serif" }}>Your Balance: {balance}</p>
-          <p style={{ fontFamily: "Sans-serif" }}>Owner Name: {ownerName}</p>
-  
-          <button style={{ backgroundColor: "#cyan" }} onClick={deposit}>
-            Deposit 1 ETH
-          </button>
-          <button style={{ backgroundColor: "yellow" }} onClick={withdraw}>
-            Withdraw 1 ETH
-          </button>
-        </div>
-  
-        <div>
-          <h2>Calculator</h2>
-          <p style={{ fontFamily: "Sans-serif" }}>Add: {add ? add.toString() : ""}</p>
-          <p style={{ fontFamily: "Sans-serif" }}>Sub: {sub ? sub.toString() : ""}</p>
-          <p style={{ fontFamily: "Sans-serif" }}>Multiply: {mult ? mult.toString() : ""}</p>
-
-          <input
-            type="number"
-            placeholder="Enter value A"
-            value={inputA}
-            onChange={handleInputAChange}
-          />
-          <input
-            type="number"
-            placeholder="Enter value B"
-            value={inputB}
-            onChange={handleInputBChange}
-          />
-  
-          <button style={{ backgroundColor: "grey" }} onClick={addition}>
-            Add
-          </button>
-          <button style={{ backgroundColor: "grey" }} onClick={subtraction}>
-            Sub
-          </button>
-          <button style={{ backgroundColor: "grey" }} onClick={multiplication}>
-            Multiply
-          </button>
-        </div>
-      </>
+      <div class="overlay">
+        <p>Your Balance: {balance}</p>
+        <p>Your Account: {account}</p>
+        <button onClick={deposit}>Deposit 1 ETH</button>
+        <button onClick={withdraw}>Withdraw 1 ETH</button>
+      </div>
     );
-    
-  }
+  };
 
   useEffect(() => {
     getWallet();
-    checkOwner();
   }, []);
 
   return (
     <main className="container">
-      <header><h1>Welcome to the Crypto ATM!</h1></header>
+      <header>
+        <h1>HEY, WELCOME</h1>
+        <p>what do you want to do here:</p>
+      </header>
       {initUser()}
-      <style jsx>{`
-        .container {
-          text-align: center
-        }
-        
-      `}
+      <style jsx>
+        {`
+          .container {
+            text-align: center;
+            background-color: grey;
+            background-size: cover;
+            color: #fff;
+            font-family: "Algerian", serif;
+          }
+
+          header {
+            padding: 34px;
+          }
+
+          h1 {
+            font-family: "Arial", serif;
+            font-size: 70px;
+            margin-bottom: 20px;
+          }
+
+          p {
+            font-size: 22px;
+            margin-bottom: 20px;
+          }
+
+          button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 20px 30px;
+            font-size: 20px;
+            cursor: pointer;
+          }
+
+          button:hover {
+            cursor: pointer;
+          }
+        `}
       </style>
     </main>
-  )
+  );
 }
