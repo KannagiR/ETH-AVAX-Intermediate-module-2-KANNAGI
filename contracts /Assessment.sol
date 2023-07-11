@@ -4,34 +4,30 @@ pragma solidity ^0.8.16;
 //import "hardhat/console.sol";
 
 contract Assessment {
-    address payable public owner;
-    uint256 public balance;
-    // uint public b=5;
+   
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
     
 
-
-    constructor(uint initBalance) payable {
-        owner = payable(msg.sender);
-        balance = initBalance;
-    }
-
+    mapping(address => uint256) public balanceOf;
+    mapping(address => address) public ownerOf;                                                                                                                                         
+      
+    
     function getBalance() public view returns(uint256){
-        return balance;
+    return balanceOf[msg.sender];
     }
 
     function depositamount(uint256 _amount) public payable {
-        uint _previousBalance = balance;
+        // Get the previous balance of the account
+        uint _previousbalance= balanceOf[msg.sender];
 
-        // make sure this is the owner
-        require(msg.sender == owner, "You are not the owner of this account");
 
         // perform transaction
-        balance += _amount;
+        balanceOf[msg.sender] += _amount;
+
 
         // assert transaction completed successfully
-        assert(balance == _previousBalance + _amount);
+        assert(balanceOf[msg.sender] == _previousbalance + _amount);
 
         // emit the event
         emit Deposit(_amount);
@@ -41,29 +37,30 @@ contract Assessment {
     error InsufficientBalance(uint256 balance, uint256 withdrawAmount);
 
     function withdrawamount(uint256 _withdrawAmount) public {
-        require(msg.sender == owner, "You are not the owner.");
-        uint _previousBalance = balance;
-        if (balance < _withdrawAmount) {
+       
+        uint _previousBalance = balanceOf[msg.sender];
+        if (balanceOf[msg.sender] < _withdrawAmount) {
             revert InsufficientBalance({
-                balance: balance,
+                balance: _previousBalance,
                 withdrawAmount: _withdrawAmount
             });
         }
 
         // withdrawamount
-        balance -= _withdrawAmount;
+        balanceOf[msg.sender] -= _withdrawAmount;
 
         // assert if the balance is correct
-        assert(balance == (_previousBalance - _withdrawAmount));
+        assert(balanceOf[msg.sender] == (_previousBalance - _withdrawAmount));
 
         // emit the event
         emit Withdraw(_withdrawAmount);
     }
-
-    function Ownercheck()public pure returns(string memory){
-        string memory name="Kannagi Rajkhowa";
-        return name;
+    
+    // Function to check the balance of an account
+    function checkBalance() public view returns(uint256) {
+    address account = msg.sender;
+    return balanceOf[account];
     }
-    
-    
+ 
+}
   
