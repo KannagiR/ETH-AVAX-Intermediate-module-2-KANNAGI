@@ -1,5 +1,5 @@
-import {useState, useEffect} from "react";
-import {ethers} from "ethers";
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import atm_abi from "../artifacts/contracts/Assessment.sol/Assessment.json";
 
 export default function HomePage() {
@@ -51,27 +51,33 @@ export default function HomePage() {
     setATM(atmContract);
   };
 
-  const getBalance = async () => {
+  const getBalance = async (walletaddress) => {
     if (atm) {
-      setBalance((await atm.getBalance()).toNumber());
+      alert(walletaddress)
+      setBalance((await atm.getBalanceFromWalletAddress(walletaddress)).toNumber());
     }
   };
 
   const deposit = async () => {
+    alert(account)
     if (atm) {
-      let tx = await atm.deposit(1, { gasLimit: 3e7 });
+      let tx = await atm.depositamount(1, { gasLimit: 3e7 });
       await tx.wait();
-      getBalance();
+      getBalance(account[0]);
     }
   };
 
   const withdraw = async () => {
     if (atm) {
-      let tx = await atm.withdraw(1, { gasLimit: 3e7 });
+      let tx = await atm.withdrawamount(1, { gasLimit: 3e7 });
       await tx.wait();
-      getBalance();
+      getBalance(account[0]);
     }
   };
+  // const changeaccount = async () => {
+  //   handleAccount([prompt("Enter wallet address")])
+  //   getBalance(account[0]);
+  // }
 
   const initUser = () => {
     // Check if user has Metamask
@@ -89,7 +95,7 @@ export default function HomePage() {
     }
 
     if (balance == undefined) {
-      getBalance();
+      getBalance(account[0]);
     }
 
     return (
@@ -98,6 +104,9 @@ export default function HomePage() {
         <p>Your Account: {account}</p>
         <button onClick={deposit}>Deposit 1 ETH</button>
         <button onClick={withdraw}>Withdraw 1 ETH</button>
+        <button onClick={async () => {
+          alert((await atm.getBalanceFromWalletAddress(prompt("Wallet Address: "))).toNumber())
+        }}>check  others balance</button>
       </div>
     );
   };
