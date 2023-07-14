@@ -12,10 +12,10 @@ contract Assessment {
     mapping(address => uint256) public balanceOf;
     mapping(address => address) public ownerOf;                                                                                                                                         
       
-    
-    function getBalance() public view returns(uint256){
-    return balanceOf[msg.sender];
+    function getBalanceFromWalletAddress(address walletAddress) public view returns(uint256) {
+    return balanceOf[walletAddress];
     }
+    
 
     function depositamount(uint256 _amount) public payable {
         // Get the previous balance of the account
@@ -63,4 +63,3 @@ contract Assessment {
     }
  
 }
-  
