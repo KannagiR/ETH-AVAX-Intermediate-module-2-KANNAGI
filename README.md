@@ -15,6 +15,7 @@ The Crypto ATM component provides the following features:
 - View user's account balance
 - Deposit ETH into the ATM
 - Withdraw ETH from the ATM
+- Check other's balance from wallet address
 
 
 Please note that the component assumes you have set up and configured MetaMask in your browser.
@@ -47,5 +48,7 @@ withdrawamount(uint256 _withdrawAmount): A function that allows users to withdra
 error InsufficientBalance(uint256 balance, uint256 withdrawAmount): A custom error that is used when a withdrawal amount exceeds the contract balance.
 
 checkbalance(): To check the balance of the user.
+
+getbalancefromwalletaddress(address walletAddress): It will check the balance of another account with the given wallet address. Anyone will be abale to check the balance of any account with the wallet address.
 
  
